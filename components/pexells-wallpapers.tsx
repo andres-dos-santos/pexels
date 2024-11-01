@@ -1,36 +1,43 @@
-import { ActivityIndicator, FlatList, View } from 'react-native'
-import { useQuery } from '@tanstack/react-query'
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  View,
+} from 'react-native'
 
-import { Photo } from './photo'
+import { usePexels } from '@/hooks/use-pexels'
 
 import type { TPhoto } from '@/types/photo.type'
 
-const uri = `https://api.pexels.com/v1/search?query=mobile wallpaper&orientation=portrait`
-const PEXELS_API_KEY = process.env.EXPO_PUBLIC_PEXELS_API_KEY
+const { width } = Dimensions.get('screen')
 
-type SearchPayload = {
-  total_results: number
-  page: number
-  per_page: number
-  photos: TPhoto[]
+const _spacing = 12
+const _imageWidth = width * 0.7
+const _imageHeight = _imageWidth * 1.76
+
+type Props = {
+  item: TPhoto
+  index: number
+}
+
+export function Photo({ item }: Props) {
+  return (
+    <View
+      style={{
+        width: _imageWidth,
+        height: _imageHeight,
+        overflow: 'hidden',
+        borderRadius: 16,
+      }}
+    >
+      <Image alt="" source={{ uri: item.src.large }} style={{ flex: 1 }} />
+    </View>
+  )
 }
 
 export function PexelsWallpaper() {
-  const { data, isLoading } = useQuery<SearchPayload>({
-    queryKey: ['wallpapers'],
-    queryFn: async () => {
-      const res = await fetch(uri, {
-        method: 'GET',
-        headers: {
-          Authorization: PEXELS_API_KEY ?? '',
-        },
-      }).then((res) => res.json())
-
-      console.log(res)
-
-      return res
-    },
-  })
+  const { data, isLoading } = usePexels()
 
   if (isLoading) {
     return (
@@ -45,6 +52,15 @@ export function PexelsWallpaper() {
       <FlatList
         data={data?.photos}
         keyExtractor={(item) => String(item.id)}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={_imageWidth + _spacing}
+        decelerationRate="fast"
+        style={{ flexGrow: 0 }}
+        contentContainerStyle={{
+          gap: _spacing,
+          paddingHorizontal: (width - _imageWidth) / 2,
+        }}
         renderItem={({ item, index }) => <Photo item={item} index={index} />}
       />
     </View>
