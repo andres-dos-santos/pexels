@@ -1,11 +1,4 @@
-import {
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  Image,
-  StyleSheet,
-  View,
-} from 'react-native'
+import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native'
 
 import { usePexels } from '@/hooks/use-pexels'
 
